@@ -1510,7 +1510,7 @@
   </div> <!-- End Authenticated Application Container (#authenticatedApp) -->
 
   <!-- Application Script (Cache Busted) -->
-  <script src="app.js?v=20261030_v7_clean_auth"></script>
+  <script src="app.js?v=20261030_v8_cloud_sync"></script>
 
   <!-- Clerk Corporate Authentication Gate & Lifecycle Handler -->
   <script>
@@ -1554,6 +1554,11 @@
         window.Clerk.mountUserButton(userButtonEl, {
           afterSignOutUrl: window.location.href
         });
+      }
+
+      // Synchronize latest cloud documents from Supabase
+      if (window.store && typeof window.store.syncCloudRecords === 'function') {
+        window.store.syncCloudRecords();
       }
     }
     window.showDashboard = showDashboard;

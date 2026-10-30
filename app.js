@@ -124,8 +124,6 @@ class Store {
     } catch (e) {
       console.warn("Error reading localStorage:", e);
     }
-    // Start with 0 dummy records
-    this.saveRecords([]);
     return [];
   }
 
@@ -138,14 +136,66 @@ class Store {
     this.records = records;
   }
 
-  addRecord(record) {
-    const updated = [record, ...this.records];
-    this.saveRecords(updated);
+  async syncCloudRecords() {
+    if (!window.SUPABASE_URL) return;
+    try {
+      const cacheBuster = Date.now();
+      const url = `${window.SUPABASE_URL}/storage/v1/object/public/documents/_metadata/records.json?t=${cacheBuster}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const cloudRecords = await res.json();
+        if (Array.isArray(cloudRecords) && cloudRecords.length > 0) {
+          // Update memory and local cache with cloud source of truth
+          this.records = cloudRecords;
+          try {
+            localStorage.setItem(this.storageKey, JSON.stringify(cloudRecords));
+          } catch (e) {}
+
+          // Refresh current UI view
+          if (this.currentCategorySlug) {
+            renderCategoryWorkspace(this.currentCategorySlug);
+          } else {
+            renderOverview();
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Cloud records sync warning:", err);
+    }
   }
 
-  deleteRecord(id) {
-    const updated = this.records.filter(r => r.id !== id);
-    this.saveRecords(updated);
+  async pushToCloud() {
+    if (!window.SUPABASE_URL || !window.SUPABASE_KEY) return;
+    try {
+      const cleanRecords = this.records.map(r => ({
+        ...r,
+        file_url: (r.file_url && r.file_url.startsWith('data:')) ? '' : r.file_url
+      }));
+      await fetch(`${window.SUPABASE_URL}/storage/v1/object/documents/_metadata/records.json`, {
+        method: "POST",
+        headers: {
+          "apikey": window.SUPABASE_KEY,
+          "Authorization": `Bearer ${window.SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "x-upsert": "true"
+        },
+        body: JSON.stringify(cleanRecords)
+      });
+    } catch (err) {
+      console.warn("Could not push metadata to cloud:", err);
+    }
+  }
+
+  async addRecord(record) {
+    this.records = [record, ...this.records.filter(r => r.id !== record.id)];
+    this.saveRecords(this.records);
+    await this.pushToCloud();
+  }
+
+  async deleteRecord(id) {
+    this.records = this.records.filter(r => r.id !== id);
+    this.saveRecords(this.records);
+    await this.pushToCloud();
   }
 
   getRecordsForCategory(slug) {
@@ -176,6 +226,10 @@ class Store {
 }
 
 const store = new Store();
+window.store = store;
+
+// Initial cloud records sync from Supabase
+store.syncCloudRecords();
 
 // --- 5. Format Utilities ---
 function formatFileSize(bytes) {
@@ -768,6 +822,11 @@ function handleRouting() {
   const hash = window.location.hash || "#/category";
   const parts = hash.replace(/^#\/?/, "").split("/");
 
+  // Always sync latest cloud records from Supabase on navigation
+  if (window.store && typeof window.store.syncCloudRecords === "function") {
+    window.store.syncCloudRecords();
+  }
+
   if (parts[0] === "category" && parts[1]) {
     renderCategoryWorkspace(parts[1]);
   } else if (parts[0] === "contact") {
@@ -1116,7 +1175,7 @@ async function handleUploadSubmit(e) {
         created_at: new Date().toISOString()
       };
 
-      store.addRecord(newRecord);
+      await store.addRecord(newRecord);
 
       submitBtn.disabled = false;
       closeUploadModal();
@@ -1625,7 +1684,7 @@ async function deleteRecordPrompt(recordId) {
         console.warn("Could not delete from Supabase storage via fetch:", err);
       }
     }
-    store.deleteRecord(recordId);
+    await store.deleteRecord(recordId);
     showToast(`Document "${rec.title}" permanently removed.`);
     renderCategoryWorkspace(store.currentCategorySlug);
   }
