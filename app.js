@@ -144,14 +144,22 @@ class Store {
       const res = await fetch(url);
       if (res.ok) {
         const cloudRecords = await res.json();
-        if (Array.isArray(cloudRecords) && cloudRecords.length > 0) {
+        if (Array.isArray(cloudRecords)) {
+          const newJson = JSON.stringify(cloudRecords);
+          const currentJson = JSON.stringify(this.records);
+
+          // If records are identical, do not re-render (prevents flicker!)
+          if (newJson === currentJson) {
+            return;
+          }
+
           // Update memory and local cache with cloud source of truth
           this.records = cloudRecords;
           try {
-            localStorage.setItem(this.storageKey, JSON.stringify(cloudRecords));
+            localStorage.setItem(this.storageKey, newJson);
           } catch (e) {}
 
-          // Refresh current UI view
+          // Refresh current UI view ONLY when data changed
           if (this.currentCategorySlug) {
             renderCategoryWorkspace(this.currentCategorySlug);
           } else {
@@ -199,19 +207,8 @@ class Store {
   }
 
   getRecordsForCategory(slug) {
-    const normalizedSlug = slug.toLowerCase();
-    return this.records.filter(r => {
-      const recordSlug = r.category_slug.toLowerCase();
-      if (normalizedSlug === "extension") {
-        return recordSlug === "extension" ||
-          recordSlug === "farmer-training" ||
-          r.id === "rec-train-1";
-      }
-      if (normalizedSlug === "demo-plots" && r.id === "rec-train-1") {
-        return false;
-      }
-      return recordSlug === normalizedSlug;
-    });
+    const normalizedSlug = (slug || "").toLowerCase();
+    return this.records.filter(r => (r.category_slug || "").toLowerCase() === normalizedSlug);
   }
 
   saveOfficeRecord(type, data) {
@@ -444,7 +441,7 @@ function renderCategoriesOverview() {
   }).join("");
 
   container.innerHTML = `
-    <div class="dashboard-watermark-container w-full space-y-6 sm:space-y-8 animate-fade-in relative">
+    <div class="dashboard-watermark-container w-full space-y-6 sm:space-y-8 relative">
       <div class="relative z-10 space-y-1">
         <div class="flex items-center gap-2.5">
           <div class="p-2 rounded-xl bg-[#EDF3FE] text-[#1E63E9] border border-[#D0E0FD]">
@@ -702,7 +699,7 @@ function renderCategoryWorkspace(slug) {
   `;
 
   container.innerHTML = `
-    <div class="space-y-6 animate-fade-in w-full">
+    <div class="space-y-6 w-full">
       <!-- Breadcrumb & Category Hero Banner -->
       <div class="p-6 rounded-2xl bg-white border border-[#E6ECF5] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 w-full">
         <div class="space-y-2">
@@ -858,7 +855,7 @@ function renderContactSection() {
 
   // Breadcrumb & Content
   container.innerHTML = `
-    <div class="max-w-3xl w-full mx-auto space-y-6 animate-fade-in">
+    <div class="max-w-3xl w-full mx-auto space-y-6">
       <!-- Breadcrumb Navigation -->
       <nav class="flex items-center gap-2 text-xs text-[#6B7A90]">
         <a href="#/category" class="text-[#1E63E9] hover:underline font-semibold">Dashboard</a>
@@ -884,7 +881,7 @@ function renderContactSection() {
             </div>
           </div>
           <div class="flex items-center gap-2.5 shrink-0">
-            <a href="https://wa.me/923067500705" target="_blank" class="btn-sky flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-sm">
+            <a href="https://wa.me/923065000705" target="_blank" class="btn-sky flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#15803D]">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
               </svg>
@@ -917,9 +914,9 @@ function renderContactSection() {
           <div class="p-4 sm:p-5 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] flex items-center justify-between gap-3">
             <div class="min-w-0">
               <span class="text-[11px] uppercase font-bold text-[#6B7A90] block mb-1">Direct Phone / WhatsApp</span>
-              <a href="tel:03067500705" class="text-sm font-semibold text-[#0B1F4A] hover:text-[#1E63E9]">0306-7500705</a>
+              <a href="tel:03065000705" class="text-sm font-semibold text-[#0B1F4A] hover:text-[#1E63E9]">0306-5000705</a>
             </div>
-            <button type="button" onclick="copyToClipboard('03067500705', 'Phone number copied!')" class="px-3 py-1.5 text-xs font-semibold text-[#1E63E9] bg-white border border-[#1E63E9]/30 hover:bg-[#EDF3FE] hover:border-[#1E63E9] rounded-lg transition cursor-pointer shrink-0 shadow-sm">
+            <button type="button" onclick="copyToClipboard('03065000705', 'Phone number copied!')" class="px-3 py-1.5 text-xs font-semibold text-[#1E63E9] bg-white border border-[#1E63E9]/30 hover:bg-[#EDF3FE] hover:border-[#1E63E9] rounded-lg transition cursor-pointer shrink-0 shadow-sm">
               Copy
             </button>
           </div>
