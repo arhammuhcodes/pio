@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Project Implementation Office - PHLCEP Swabi</title>
+  <meta name="description" content="Official Digital Record Management & Project Management Hub for Project Implementation Office Pehur High Level Canal Extension Project Swabi — Created by aqbukhari"/>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16"/>
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  
+  
+  <!-- Official Clerk JavaScript SDK (All-In-One with prebuilt UI) -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_aGFyZHktd29tYmF0LTQyNjMuY2xlcmsuYWNjb3VudHMuZGV2JA"
+    src="https://hardy-wombat-4263.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
+    type="text/javascript"
+  ></script>
+  
+  <!-- Supabase Cloud Storage SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.SUPABASE_URL = "https://atjvewnjenldrffcmdeh.supabase.co";
+    window.SUPABASE_KEY = "sb_publishable_cE__NtG7nHiDva0HUCVS7g_5LMUsLdH";
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+      console.log("Supabase Cloud Storage initialized:", window.SUPABASE_URL);
+    }
+  </script>
+  
+  <!-- Production Tailwind Stylesheet -->
+  <link rel="stylesheet" href="app.css"/>
+  
+  <style>
+    /* ==========================================================================
+       Design System CSS Variables (Tokens based on Target Reference)
+       ========================================================================== */
+    :root {
+      --bg-page: #F4F7FC;
+      --bg-card: #FFFFFF;
+      --border-card: #E6ECF5;
+      --border-subtle: #EEF2F8;
+      --shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
+      --shadow-hover: 0 6px 16px rgba(16, 24, 40, 0.08);
+
+      --color-navy: #0B1F4A;
+      --color-secondary: #4B5B75;
+      --color-muted: #6B7A90;
+      --color-grey-border: #DDE4EE;
+
+      --primary-blue: #1E63E9;
+      --primary-blue-hover: #1652C7;
+      --primary-blue-light: #EDF3FE;
+      --primary-blue-border: #D0E0FD;
+
+      --status-active-bg: #EBF3FF;
+      --status-active-text: #1E63E9;
+      --status-completed-bg: #E7F7EE;
+      --status-completed-text: #15803D;
+
+      --sidebar-bg: #0B1F4A;
+      --sidebar-hover: #162E69;
+      --sidebar-active: #1E63E9;
+      --sidebar-text: #D6E0F0;
+      --sidebar-text-muted: #8EA3C7;
+      --sidebar-border: rgba(255, 255, 255, 0.08);
+
+      --radius-sm: 8px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
+
+    /* Reset default outline focus on mouse click; keep clean 2px ring only for keyboard focus */
+    *:focus {
+      outline: none !important;
+    }
+    *:focus-visible {
+      outline: 2px solid var(--primary-blue) !important;
+      outline-offset: 2px !important;
+    }
+    a:focus, button:focus {
+      outline: none !important;
+    }
+
+    html, body {
+      background: var(--bg-page) !important;
+      color: var(--color-navy) !important;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #EDF2F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C4D2E3;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-blue);
+    }
+
+    /* Primary & Secondary Buttons */
+    .btn-emerald,
+    .btn-primary-emerald,
+    .btn-primary-blue {
+      background: var(--primary-blue) !important;
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      height: 40px !important;
+      border: 1px solid var(--primary-blue) !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: 0 1px 3px rgba(30, 99, 233, 0.2) !important;
+      transition: all 0.15s ease !important;
+      text-shadow: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .btn-emerald:hover,
+    .btn-primary-emerald:hover,
+    .btn-primary-blue:hover {
+      background: var(--primary-blue-hover) !important;
+      border-color: var(--primary-blue-hover) !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 3px 8px rgba(30, 99, 233, 0.28) !important;
+    }
+
+    .btn-sky,
+    .btn-secondary-sky,
+    .btn-secondary-outline {
+      background: #FFFFFF !important;
+      color: var(--color-navy) !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      height: 40px !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+      transition: all 0.15s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .btn-sky:hover,
+    .btn-secondary-sky:hover,
+    .btn-secondary-outline:hover {
+      background: #F8FAFD !important;
+      border-color: var(--primary-blue-border) !important;
+      color: var(--primary-blue) !important;
+    }
+
+    .btn-outline-primary {
+      background: #FFFFFF !important;
+      color: var(--primary-blue) !important;
+      font-weight: 600 !important;
+      font-size: 13px !important;
+      border: 1px solid var(--primary-blue-border) !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) !important;
+      transition: all 0.15s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .btn-outline-primary:hover {
+      background: var(--primary-blue-light) !important;
+      border-color: var(--primary-blue) !important;
+      color: var(--primary-blue-hover) !important;
+    }
+
+    /* Status Pills */
+    .badge-pill-sky,
+    .badge-status-active {
+      background: var(--status-active-bg) !important;
+      color: var(--status-active-text) !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      padding: 4px 10px !important;
+      border-radius: var(--radius-full) !important;
+      border: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      letter-spacing: 0.01em !important;
+    }
+    .badge-pill-emerald,
+    .badge-status-completed {
+      background: var(--status-completed-bg) !important;
+      color: var(--status-completed-text) !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      padding: 4px 10px !important;
+      border-radius: var(--radius-full) !important;
+      border: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      letter-spacing: 0.01em !important;
+    }
+
+    /* Category Code Pill (PKG-01 etc.) */
+    .pill-pkg-code {
+      background: #EDF3FE !important;
+      color: var(--primary-blue) !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      padding: 3px 10px !important;
+      border-radius: var(--radius-full) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      letter-spacing: 0.01em !important;
+    }
+
+    /* Clean Card */
+    .category-card {
+      background: #FFFFFF !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow-card) !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      padding: 24px !important;
+      text-decoration: none !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+    .category-card:hover {
+      transform: translateY(-2px) !important;
+      border-color: #B8D0F8 !important;
+      box-shadow: var(--shadow-hover) !important;
+    }
+
+    .subtle-panel {
+      background: #FFFFFF !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow-card) !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+    .category-card:hover {
+      transform: translateY(-2px) !important;
+      border-color: #B8D0F8 !important;
+      box-shadow: var(--shadow-hover) !important;
+    }
+
+    .subtle-panel {
+      background: #FFFFFF !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow-card) !important;
+    }
+
+    /* Form inputs */
+    input, textarea, select {
+      background-color: #FFFFFF !important;
+      color: var(--color-navy) !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: var(--radius-md) !important;
+      font-size: 14px !important;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary-blue) !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(30, 99, 233, 0.12) !important;
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--color-grey-muted) !important;
+    }
+
+    /* Attribution Badge */
+    .badge-3d-aqbukhari {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      background: var(--primary-blue-light);
+      border: 1px solid var(--primary-blue-border);
+      border-radius: var(--radius-full);
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .badge-3d-aqbukhari:hover {
+      background: var(--primary-blue);
+      color: #FFFFFF;
+      border-color: var(--primary-blue);
+    }
+
+    /* Sidebar Brand Top */
+    .sidebar-brand {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      padding: 18px 20px !important;
+      border-bottom: 1px solid var(--sidebar-border) !important;
+      text-decoration: none !important;
+    }
+    .category-card h3 {
+      text-transform: uppercase !important;
+      font-size: 0.9rem !important;
+      line-height: 1.3 !important;
+      white-space: normal !important;
+      display: block !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+    }
+    .sidebar-brand-img {
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: var(--radius-md) !important;
+      object-fit: cover !important;
+      flex-shrink: 0 !important;
+      background: #FFFFFF !important;
+      padding: 2px !important;
+    }
+
+    /* Sidebar Nav Links */
+    .sidebar-link {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 10px 14px !important;
+      border-radius: var(--radius-md) !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: var(--sidebar-text) !important;
+      text-decoration: none !important;
+      transition: all 0.15s ease !important;
+    }
+    .sidebar-link:hover {
+      background: var(--sidebar-hover) !important;
+      color: #FFFFFF !important;
+    }
+    .sidebar-link.active {
+      background: var(--sidebar-active) !important;
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+    }
+
+    .sidebar-pkg-item {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 8px 12px !important;
+      border-radius: var(--radius-sm) !important;
+      font-size: 13px !important;
+      color: var(--sidebar-text-muted) !important;
+      text-decoration: none !important;
+      transition: all 0.15s ease !important;
+    }
+    .sidebar-pkg-item:hover {
+      background: var(--sidebar-hover) !important;
+      color: #FFFFFF !important;
+    }
+    .sidebar-pkg-item.active {
+      background: var(--sidebar-active) !important;
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+    }
+
+    /* Contact AQ Logo Badge */
+    .contact-aq-bezel {
+      width: 80px !important;
+      height: 60px !important;
+      min-width: 80px !important;
+      max-width: 80px !important;
+      border-radius: var(--radius-md) !important;
+      background: #FFFFFF !important;
+      border: 1px solid var(--border-card) !important;
+      padding: 6px 8px !important;
+      box-shadow: var(--shadow-card) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
+    }
+    .contact-aq-bezel:hover {
+      transform: translateY(-2px) !important;
+      border-color: var(--primary-blue) !important;
+      box-shadow: var(--shadow-hover) !important;
+    }
+    .contact-aq-bezel img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
+
+    /* Fixed Sidebar & Layout */
+    #sidebar {
+      width: 255px !important;
+      min-width: 255px !important;
+      max-width: 255px !important;
+      background: var(--sidebar-bg) !important;
+      border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+    }
+    @media (min-width: 1024px) {
+      #sidebar {
+        transform: translateX(0) !important;
+      }
+      .main-layout-area {
+        padding-left: 255px !important;
+      }
+      #openSidebarBtn {
+        display: none !important;
+      }
+    }
+    @media (max-width: 1023px) {
+      .main-layout-area {
+        padding-left: 0 !important;
+      }
+      #openSidebarBtn {
+        display: inline-flex !important;
+      }
+    }
+
+    /* Watermark shared by every main page */
+    #mainContainer {
+      position: relative !important;
+      isolation: isolate !important;
+      overflow: hidden !important;
+    }
+    #mainContainer::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background-image: url('watermark_emblem.png') !important;
+      background-size: min(1100px, 120vw) !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      opacity: 0.5 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      z-index: 0 !important;
+    }
+    #mainContainer > * {
+      position: relative !important;
+      z-index: 1 !important;
+    }
+    .dashboard-watermark-container {
+      position: relative !important;
+      min-height: calc(100vh - 12rem) !important;
+    }
+    .dashboard-watermark-bg {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: min(720px, 90vw) !important;
+      height: min(720px, 90vw) !important;
+      background-image: url('watermark_emblem.png') !important;
+      background-size: contain !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      z-index: 0 !important;
+    }
+
+    /* Animation helpers */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.15s ease-out forwards;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-modal-in {
+      animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ==========================================================================
+       Corporate Login Screen Dedicated CSS (Fixes double colour & overlapping)
+       ========================================================================== */
+    #authLoadingScreen {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 100000 !important;
+      background-color: #0B1F4A !important;
+      color: #FFFFFF !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 24px !important;
+    }
+
+    /* Modal Backdrop and Solid Crisp White Card Styling (No Glass Bleedthrough) */
+    #contactModal, #uploadModal, #newRecordModal, #docViewerModal, #shareModal {
+      background-color: rgba(11, 31, 74, 0.85) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    #contactModal > div,
+    #uploadModal > div,
+    #newRecordModal > div,
+    #docViewerModal > div,
+    #shareModal > div {
+      background-color: #FFFFFF !important;
+      background: #FFFFFF !important;
+      opacity: 1 !important;
+      border: 1px solid #DCE4F0 !important;
+      box-shadow: 0 25px 50px -12px rgba(11, 31, 74, 0.25), 0 0 0 1px rgba(11, 31, 74, 0.05) !important;
+    }
+    .bg-white {
+      background-color: #FFFFFF !important;
+    }
+
+    #corporateLoginScreen {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 99999 !important;
+      background-color: #F4F7FC !important;
+      background-image: radial-gradient(#DDE4EE 1.5px, transparent 1.5px) !important;
+      background-size: 24px 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px !important;
+      overflow-y: auto !important;
+    }
+    #corporateLoginScreen.hidden-auth {
+      display: none !important;
+    }
+
+    #authenticatedApp.hidden-auth {
+      display: none !important;
+    }
+
+    .corp-login-card {
+      width: 100% !important;
+      max-width: 420px !important;
+      background: #FFFFFF !important;
+      border: 1px solid #E6ECF5 !important;
+      border-radius: 16px !important;
+      box-shadow: 0 16px 40px rgba(11, 31, 74, 0.09), 0 2px 6px rgba(11, 31, 74, 0.04) !important;
+      overflow: hidden !important;
+      margin: auto !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+
+    .corp-login-header {
+      background-color: #0B1F4A !important;
+      padding: 26px 24px 22px !important;
+      text-align: center !important;
+      color: #FFFFFF !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .corp-emblem-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 68px !important;
+      height: 68px !important;
+      border-radius: 16px !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      margin-bottom: 12px !important;
+      padding: 6px !important;
+    }
+
+    .corp-emblem-badge img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35)) !important;
+    }
+
+    .corp-login-title {
+      font-size: 17px !important;
+      font-weight: 800 !important;
+      color: #FFFFFF !important;
+      margin: 0 !important;
+      line-height: 1.3 !important;
+      letter-spacing: -0.01em !important;
+    }
+
+    .corp-login-sub {
+      font-size: 12px !important;
+      color: #8EA3C7 !important;
+      margin-top: 4px !important;
+      margin-bottom: 12px !important;
+      font-weight: 500 !important;
+    }
+
+    .corp-security-pill {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      padding: 4px 12px !important;
+      border-radius: 9999px !important;
+      background: rgba(30, 99, 233, 0.25) !important;
+      border: 1px solid rgba(142, 163, 199, 0.3) !important;
+      color: #D6E0F0 !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+    }
+
+    .corp-login-body {
+      padding: 26px 24px 24px !important;
+      background: #FFFFFF !important;
+    }
+
+    .corp-error-box {
+      margin-bottom: 16px !important;
+      padding: 12px 14px !important;
+      border-radius: 10px !important;
+      background: #FFF1F2 !important;
+      border: 1px solid #FECDD3 !important;
+      color: #BE123C !important;
+      font-size: 12px !important;
+      display: none !important;
+      align-items: flex-start !important;
+      gap: 8px !important;
+    }
+    .corp-error-box.visible {
+      display: flex !important;
+    }
+
+    .corp-field-group {
+      margin-bottom: 16px !important;
+    }
+
+    .corp-field-label {
+      display: block !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: #0B1F4A !important;
+      margin-bottom: 6px !important;
+    }
+
+    .corp-input-box {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .corp-input-icon {
+      position: absolute !important;
+      left: 14px !important;
+      color: #8EA3C7 !important;
+      pointer-events: none !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .corp-input {
+      width: 100% !important;
+      height: 44px !important;
+      padding-left: 42px !important;
+      padding-right: 40px !important;
+      background: #F8FAFD !important;
+      border: 1px solid #DDE4EE !important;
+      border-radius: 10px !important;
+      font-size: 13.5px !important;
+      color: #0B1F4A !important;
+      font-family: inherit !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .corp-input:focus {
+      background: #FFFFFF !important;
+      border-color: #1E63E9 !important;
+      box-shadow: 0 0 0 3px rgba(30, 99, 233, 0.12) !important;
+    }
+
+    .corp-eye-btn {
+      position: absolute !important;
+      right: 12px !important;
+      color: #8EA3C7 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 4px !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .corp-eye-btn:hover {
+      color: #0B1F4A !important;
+    }
+
+    .corp-submit-btn {
+      width: 100% !important;
+      height: 44px !important;
+      background: #0B1F4A !important;
+      color: #FFFFFF !important;
+      border: none !important;
+      border-radius: 10px !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      margin-top: 6px !important;
+      transition: background 0.15s ease, transform 0.1s ease !important;
+      box-shadow: 0 4px 12px rgba(11, 31, 74, 0.15) !important;
+    }
+
+    .corp-submit-btn:hover {
+      background: #162E69 !important;
+    }
+
+    .corp-submit-btn:active {
+      transform: translateY(1px) !important;
+    }
+
+    .corp-notice {
+      margin-top: 18px !important;
+      padding: 12px 14px !important;
+      border-radius: 10px !important;
+      background: #EDF3FE !important;
+      border: 1px solid #D0E0FD !important;
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 10px !important;
+    }
+
+    .corp-notice svg {
+      color: #1E63E9 !important;
+      flex-shrink: 0 !important;
+      margin-top: 2px !important;
+    }
+
+    .corp-notice-body {
+      font-size: 11.5px !important;
+      line-height: 1.5 !important;
+      color: #4B5B75 !important;
+    }
+
+    .corp-notice-body strong {
+      color: #0B1F4A !important;
+      display: block !important;
+      margin-bottom: 2px !important;
+    }
+
+    .corp-footer-copy {
+      margin-top: 14px !important;
+      text-align: center !important;
+      font-size: 11px !important;
+      color: #8EA3C7 !important;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans antialiased selection:bg-blue-500/20 selection:text-blue-900 bg-[#F4F7FC]">
+
+  <!-- Dedicated Corporate Login Screen (Instant Zero-Delay Load) -->
+  <div id="corporateLoginScreen">
+    <!-- Single Crisp Corporate Card -->
+    <div class="corp-login-card animate-modal-in">
+      <!-- Top Brand Header (Deep Navy Bar with Official Transparent Emblem) -->
+      <div class="corp-login-header">
+        <div class="corp-emblem-badge">
+          <img src="watermark_emblem.png" alt="Government of Khyber Pakhtunkhwa Emblem"/>
+        </div>
+        <h1 class="corp-login-title">
+          Project Implementation Office
+        </h1>
+        <p class="corp-login-sub">
+          PHLCEP Swabi • Digital Record Management Hub
+        </p>
+        <div class="corp-security-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Authorized Corporate Personnel Only</span>
+        </div>
+      </div>
+
+      <!-- Form Body (Direct Corporate Login Form powered by Clerk) -->
+      <div class="corp-login-body" style="padding: 24px !important;">
+        <!-- Error Alert (Clean, initially hidden) -->
+        <div id="loginErrorAlert" class="corp-error-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" x2="12" y1="8" y2="12"></line>
+            <line x1="12" x2="12.01" y1="16" y2="16"></line>
+          </svg>
+          <span id="loginErrorMsg" style="font-weight:500;line-height:1.4;"></span>
+        </div>
+
+        <form id="corporateLoginForm" autocomplete="off" onsubmit="handleCorporateLogin(event)">
+          <!-- Username Field -->
+          <div class="corp-field-group">
+            <label for="loginUsername" class="corp-field-label">
+              Corporate Username or Email
+            </label>
+            <div class="corp-input-box">
+              <span class="corp-input-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
+              <input
+                type="text"
+                id="loginUsername"
+                required
+                autocomplete="off"
+                placeholder="Enter corporate username"
+                class="corp-input"
+              />
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="corp-field-group">
+            <label for="loginPassword" class="corp-field-label">
+              Password
+            </label>
+            <div class="corp-input-box">
+              <span class="corp-input-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <input
+                type="password"
+                id="loginPassword"
+                required
+                autocomplete="new-password"
+                placeholder="••••••••••••"
+                class="corp-input"
+              />
+              <button
+                type="button"
+                onclick="togglePasswordVisibility()"
+                class="corp-eye-btn"
+                aria-label="Toggle password visibility"
+              >
+                <svg id="eyeIconOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeIconClosed" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                  <path d="m9.88 9.88 4.24 4.24"></path>
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                  <line x1="2" x2="22" y1="2" y2="22"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            id="loginSubmitBtn"
+            class="corp-submit-btn"
+          >
+            <span id="loginBtnText">Sign In to Corporate Hub</span>
+            <div id="loginBtnSpinner" style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#ffffff;border-radius:9999px;animation:spin 0.8s linear infinite;display:none;"></div>
+          </button>
+        </form>
+
+        <!-- Corporate Access Notice -->
+        <div class="corp-notice">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" x2="12" y1="16" y2="12"></line>
+            <line x1="12" x2="12.01" y1="8" y2="8"></line>
+          </svg>
+          <div class="corp-notice-body">
+            <strong>Restricted Corporate System</strong>
+            Public registration is disabled. User accounts are provisioned exclusively by the Project Implementation Office Administrator.
+          </div>
+        </div>
+
+        <p class="corp-footer-copy">
+          Project Implementation Office (PIO) Swabi • Official Secrets & Cyber Security Act
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authenticated Application (Hidden before verification) -->
+  <div id="authenticatedApp" class="contents" style="display: none;">
+
+  <!-- Mobile Backdrop -->
+  <div id="mobileBackdrop" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden transition-opacity duration-200 hidden" aria-hidden="true"></div>
+
+  <!-- Sidebar Component (Solid Deep Navy #0B1F4A, ~255px wide) -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex flex-col text-slate-200 transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0">
+    <!-- Sidebar Header / Brand Logo -->
+    <a href="#/category" class="sidebar-brand" title="Project Implementation Office • PHLCEP Swabi">
+      <img src="logo.png" alt="Government of Khyber Pakhtunkhwa" class="sidebar-brand-img"/>
+      <div class="flex flex-col min-w-0 leading-snug">
+        <span class="text-xs font-bold text-white tracking-tight block">
+          Project Implementation Office
+        </span>
+        <span class="text-[11px] text-[#8EA3C7] font-medium tracking-wide block mt-0.5">
+          PHLCEP Swabi
+        </span>
+      </div>
+    </a>
+
+    <!-- Sidebar Navigation Links -->
+    <div class="flex-1 overflow-y-auto px-3.5 py-4 space-y-4">
+      <div>
+        <!-- Categories Overview Link -->
+        <a id="nav-categories-overview" href="#/category" class="sidebar-link active">
+          <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+              <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+              <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+              <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+            </svg>
+            <span class="text-[14px]">Categories Overview</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white font-semibold">8</span>
+        </a>
+
+        <!-- Project Packages Sublist -->
+        <div class="mt-4 space-y-1">
+          <span class="text-[11px] uppercase font-bold tracking-wider text-[#7E93B5] px-2.5 block mb-1.5">Project Packages</span>
+          <div id="sidebar-packages-list" class="space-y-1">
+            <!-- Dynamically populated package links -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Bottom: Dedicated Contact Us / Helpdesk (Pinned with divider) -->
+    <div class="p-3 border-t border-white/10 bg-[#081738] mt-auto">
+      <a id="nav-contact" href="#/contact" class="sidebar-link hover:bg-white/10">
+        <div class="flex items-center gap-2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-300 shrink-0">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          <span class="text-[14px] font-semibold text-white">Contact Us / Helpdesk</span>
+        </div>
+        <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">Help</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Area with Header -->
+  <div class="main-layout-area flex-1 flex flex-col min-w-0 w-full min-h-screen">
+    
+    <!-- Top Sticky Header (Clean White Bar with Soft Border) -->
+    <header class="sticky top-0 z-30 h-16 bg-white border-b border-[#E6ECF5] px-4 sm:px-8 flex items-center justify-between gap-4">
+      <!-- Mobile Sidebar Toggle Button -->
+      <button type="button" id="openSidebarBtn" class="p-2 -ml-1 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition lg:hidden cursor-pointer shrink-0" aria-label="Open navigation menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"></line>
+          <line x1="4" x2="20" y1="6" y2="6"></line>
+          <line x1="4" x2="20" y1="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Global Search Input (Wider with white bg, 10px radius, 42px left padding to prevent icon overlap) -->
+      <form id="globalSearchForm" class="flex-1 max-w-md sm:max-w-lg" onsubmit="event.preventDefault(); handleGlobalSearch();">
+        <div class="relative group">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E9BAE] group-focus-within:text-[#1E63E9] transition-colors pointer-events-none">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" id="globalSearchInput" placeholder="Search diary #, letter, package..." class="w-full pr-4 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] placeholder-[#6B7A90] focus:outline-none focus:border-[#1E63E9] transition-all shadow-sm" style="padding-left: 42px !important;"/>
+        </div>
+      </form>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <!-- Date Badge Chip (Matching Target Reference) -->
+        <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-[10px] bg-white border border-[#E6ECF5] text-xs font-semibold text-[#0B1F4A] shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#6B7A90]">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+            <line x1="16" x2="16" y1="2" y2="6"></line>
+            <line x1="8" x2="8" y1="2" y2="6"></line>
+            <line x1="3" x2="21" y1="10" y2="10"></line>
+          </svg>
+          <span>Oct 30, 2026</span>
+        </div>
+
+        <!-- Share on Wi-Fi Button (Secondary Outlined Button) -->
+        <button type="button" onclick="openShareModal()" class="btn-sky flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-xs sm:text-sm font-semibold cursor-pointer" title="Share with devices on the same Wi-Fi">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+          <span class="hidden sm:inline">Share on Wi-Fi</span>
+          <span class="sm:hidden">Share</span>
+        </button>
+
+        <!-- New Record Dropdown Button (Solid Primary Blue Button) -->
+        <div class="relative" id="newRecordDropdownWrapper">
+          <button type="button" id="newRecordBtn" class="btn-emerald flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-2 rounded-[10px] text-xs sm:text-sm font-bold cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"></path>
+              <path d="M12 5v14"></path>
+            </svg>
+            <span class="hidden sm:inline">New Record</span>
+            <span class="sm:hidden">New</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="newRecordMenu" class="absolute right-0 mt-2 w-56 bg-white border border-[#E6ECF5] rounded-xl shadow-lg z-50 py-1.5 hidden animate-fade-in">
+            <button onclick="openNewRecordModal('diary')" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm text-[#0B1F4A] hover:bg-[#F4F7FC] hover:text-[#1E63E9] transition text-left cursor-pointer font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#1E63E9]">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+              </svg>
+              <span>Inward Letter (Diary)</span>
+            </button>
+            <button onclick="openNewRecordModal('dispatch')" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm text-[#0B1F4A] hover:bg-[#F4F7FC] hover:text-[#1E63E9] transition text-left cursor-pointer font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500">
+                <path d="m22 2-7 20-4-9-9-4Z"></path>
+                <path d="M22 2 11 13"></path>
+              </svg>
+              <span>Outward Dispatch</span>
+            </button>
+            <button onclick="openNewRecordModal('locator')" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm text-[#0B1F4A] hover:bg-[#F4F7FC] hover:text-[#1E63E9] transition text-left cursor-pointer font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500">
+                <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+              </svg>
+              <span>Physical File Locator</span>
+            </button>
+            <button onclick="openNewRecordModal('import')" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm text-[#0B1F4A] hover:bg-[#F4F7FC] hover:text-[#1E63E9] font-medium transition text-left cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+                <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                <path d="M8 13h2"></path>
+                <path d="M14 13h2"></path>
+                <path d="M8 17h2"></path>
+                <path d="M14 17h2"></path>
+              </svg>
+              <span>Import Excel Register</span>
+            </button>
+            <button onclick="openNewRecordModal('task')" class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm text-[#0B1F4A] hover:bg-[#F4F7FC] hover:text-[#1E63E9] transition text-left cursor-pointer font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500">
+                <path d="m9 11 3 3L22 4"></path>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              <span>Create Office Task</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Clerk Authenticated Corporate User Controls -->
+        <div id="clerk-auth-container" class="flex items-center gap-2.5 pl-2.5 border-l border-[#E6ECF5]">
+          <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] bg-[#F4F7FC] border border-[#E6ECF5] text-xs font-semibold text-[#0B1F4A]">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span id="clerkUserBadge" class="truncate max-w-[120px]">User</span>
+          </div>
+          <div id="clerk-user-button"></div>
+          <button type="button" onclick="handleCorporateLogout()" class="px-2.5 sm:px-3 py-1.5 rounded-[10px] bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 border border-transparent text-xs font-semibold text-[#4B5B75] transition flex items-center gap-1.5 cursor-pointer" title="Sign Out of PIO Swabi Hub">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" x2="9" y1="12" y2="12"></line>
+            </svg>
+            <span class="hidden sm:inline">Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main View Dynamic Container -->
+    <main id="mainContainer" class="flex-1 p-3.5 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
+      <!-- Injected via app.js (Categories Overview or Category Workspace) -->
+    </main>
+
+    <!-- Executive Footer -->
+    <footer class="mt-auto py-4 px-6 border-t border-[#E6ECF5] bg-white text-[#6B7A90] flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      <!-- Left spacer for true centering on desktop -->
+      <div class="hidden md:block w-36 shrink-0"></div>
+
+      <!-- Centered Project Title -->
+      <div class="flex items-center justify-center gap-2 text-center text-[#6B7A90]">
+        <span class="h-2 w-2 rounded-full bg-[#1E63E9] shrink-0"></span>
+        <span class="font-medium text-xs text-[#0B1F4A]">
+          Project Implementation Office • Pehur High Level Canal Extension Project Swabi
+        </span>
+      </div>
+
+      <!-- Right Attribution Badge -->
+      <div class="flex items-center justify-end shrink-0 gap-1.5 w-auto md:w-36">
+        <span class="text-[#8E9BAE] text-[11px] font-medium">Created by</span>
+        <span class="badge-3d-aqbukhari">aqbukhari</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Contact Us & Helpdesk Modal -->
+  <div id="contactModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;" onclick="closeContactModal()">
+    <div class="relative w-full max-w-xl bg-white border border-[#E6ECF5] rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 space-y-5 max-h-[92vh] overflow-y-auto animate-modal-in" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-[#E6ECF5]">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-xl bg-[#EDF3FE] flex items-center justify-center text-[#1E63E9] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-[#0B1F4A]">Contact &amp; Official Helpdesk</h2>
+            <p class="text-xs text-[#6B7A90]">Project Implementation Office Swabi • PHLCEP</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeContactModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Official Profile Card with AQ Dev Logo -->
+      <div class="p-4 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="contact-aq-bezel" title="AQ dev - Technical Lead">
+            <img src="aq_logo.png" alt="AQ dev"/>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-[#0B1F4A]">Engr. Azmat Qadir</h3>
+            <p class="text-xs text-[#1E63E9] font-medium">Project Implementation Officer / Technical In-Charge</p>
+            <p class="text-[12px] text-[#6B7A90] mt-0.5">Pehur High Level Canal Extension Project (PHLCEP)</p>
+          </div>
+        </div>
+        <span class="badge-status-active">Official Contact</span>
+      </div>
+
+      <!-- Contact Methods Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- Email Box -->
+        <div class="p-4 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] space-y-2">
+          <div class="flex items-center gap-2 text-xs text-[#6B7A90] font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#1E63E9]">
+              <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            <span>OFFICIAL EMAIL</span>
+          </div>
+          <div class="text-xs font-semibold text-[#0B1F4A] break-all">
+            azmatqadir93@gmail.com
+          </div>
+          <div class="pt-1 flex items-center gap-2">
+            <a href="mailto:azmatqadir93@gmail.com" class="btn-emerald flex-1 py-1.5 px-3 rounded-lg text-center text-xs font-semibold cursor-pointer">
+              Send Email
+            </a>
+            <button onclick="copyToClipboard('azmatqadir93@gmail.com', 'Email copied to clipboard!')" class="btn-sky py-1.5 px-3 rounded-lg text-xs font-semibold cursor-pointer">
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Phone / WhatsApp Box -->
+        <div class="p-4 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] space-y-2">
+          <div class="flex items-center gap-2 text-xs text-[#6B7A90] font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#22B35E]">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span>PHONE / WHATSAPP</span>
+          </div>
+          <div class="text-xs font-semibold text-[#0B1F4A]">
+            0306-7500705
+          </div>
+          <div class="pt-1 flex items-center gap-2">
+            <a href="tel:03067500705" class="btn-sky flex-1 py-1.5 px-3 rounded-lg text-center text-xs font-semibold cursor-pointer">
+              Call Direct
+            </a>
+            <a href="https://wa.me/923067500705" target="_blank" class="btn-emerald flex-1 py-1.5 px-3 rounded-lg text-center text-xs font-semibold cursor-pointer">
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Office Location & Hours -->
+      <div class="p-4 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] text-xs space-y-1.5 text-[#6B7A90]">
+        <div class="flex items-center gap-2 text-[#0B1F4A] font-semibold">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#1E63E9]">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>Office Location &amp; Duty Hours</span>
+        </div>
+        <p class="text-[12px] text-[#6B7A90] leading-relaxed">
+          Project Implementation Office (PIO), Pehur High Level Canal Extension Project (PHLCEP), Irrigation Department, Command Office Swabi, Khyber Pakhtunkhwa.
+        </p>
+        <div class="flex items-center gap-4 text-[12px] text-[#1E63E9] pt-1 font-medium">
+          <span>Office Hours: 08:30 AM – 04:30 PM (Mon – Fri)</span>
+        </div>
+      </div>
+
+      <!-- Contact Action Footer -->
+      <div class="pt-3 border-t border-[#E6ECF5] flex items-center justify-between text-xs">
+        <span class="text-[#6B7A90]">Response directed to: <strong class="text-[#1E63E9]">azmatqadir93@gmail.com</strong></span>
+        <button type="button" onclick="closeContactModal()" class="px-4 py-2 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-[#0B1F4A] font-semibold transition cursor-pointer">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Document Modal -->
+  <div id="uploadModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;" onclick="closeUploadModal()">
+    <div class="relative w-full max-w-3xl border border-[#E6ECF5] rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8 space-y-5 max-h-[92vh] overflow-y-auto animate-modal-in" style="background: #FFFFFF !important; background-color: #FFFFFF !important; opacity: 1 !important;" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E6ECF5]">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-[#EDF3FE] text-[#1E63E9] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div>
+            <h2 id="modalUploadHeading" class="text-base font-bold text-[#0B1F4A]">Feed / Upload Document</h2>
+            <p id="modalUploadSubheading" class="text-xs text-[#6B7A90]">Category: PKG-01 • Supports PDF, Word, Excel, Scans, Images</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeUploadModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer" aria-label="Close dialog">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div id="uploadErrorAlert" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 items-center gap-2 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 shrink-0 text-rose-500">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" x2="12" y1="8" y2="12"></line>
+          <line x1="12" x2="12.01" y1="16" y2="16"></line>
+        </svg>
+        <span id="uploadErrorMsg">Please select a file to upload.</span>
+      </div>
+
+      <form id="uploadDocForm" onsubmit="handleUploadSubmit(event)" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+          <!-- File selection zone -->
+          <div class="md:col-span-1 flex flex-col">
+            <label class="block text-xs font-semibold text-[#0B1F4A] mb-1.5">
+              Choose Document / File <span class="text-rose-500">*</span>
+            </label>
+            <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="flex-1 min-h-[120px] sm:min-h-[140px] p-4 rounded-xl border-2 border-dashed border-[#D0E0FD] hover:border-[#1E63E9] bg-[#F8FAFD] cursor-pointer transition flex flex-col items-center justify-center text-center space-y-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-[#1E63E9]">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div id="dropZonePrompt" class="space-y-0.5">
+                <p class="text-xs text-[#0B1F4A] font-semibold">Click or tap to select file</p>
+                <p class="text-[11px] text-[#8E9BAE]">PDF, Word, Excel, Scan, Photo</p>
+              </div>
+              <div id="dropZoneFileSelected" class="space-y-0.5 hidden">
+                <p id="selectedFileName" class="text-xs font-bold text-[#1E63E9] truncate max-w-[180px]"></p>
+                <span id="selectedFileSize" class="text-[11px] text-[#6B7A90]"></span>
+              </div>
+            </div>
+            <input id="fileInput" type="file" class="hidden" onchange="handleFileChange(event)"/>
+          </div>
+
+          <!-- Metadata form fields -->
+          <div class="md:col-span-2 space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-semibold text-[#0B1F4A] mb-1.5">
+                  Document Title <span class="text-rose-500">*</span>
+                </label>
+                <input id="docTitle" type="text" required placeholder="e.g. UPVC Technical Proposal or IPC #03" class="w-full px-3 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] placeholder-[#8E9BAE] focus:outline-none focus:border-[#1E63E9] transition"/>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#0B1F4A] mb-1.5">
+                  Document Classification
+                </label>
+                <select id="docClassification" onchange="handleClassificationChange(event)" class="w-full px-3 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] focus:outline-none focus:border-[#1E63E9] cursor-pointer transition">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="flex items-center justify-between text-xs font-semibold text-[#0B1F4A] mb-1.5">
+                  <span class="flex items-center gap-1.5 whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#1E63E9] shrink-0">
+                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                      <line x1="16" x2="16" y1="2" y2="6"></line>
+                      <line x1="8" x2="8" y1="2" y2="6"></line>
+                      <line x1="3" x2="21" y1="10" y2="10"></line>
+                    </svg>
+                    Document Date <span class="text-rose-500">*</span>
+                  </span>
+                  <span class="text-[11px] text-[#8E9BAE] font-normal">Date on doc</span>
+                </label>
+                <input id="docDate" type="date" required class="w-full px-3 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] focus:outline-none focus:border-[#1E63E9] transition"/>
+              </div>
+
+              <div>
+                <label class="flex items-center justify-between text-xs font-semibold text-[#0B1F4A] mb-1.5">
+                  <span class="flex items-center gap-1.5 whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#22B35E] shrink-0">
+                      <line x1="4" x2="20" y1="9" y2="9"></line>
+                      <line x1="4" x2="20" y1="15" y2="15"></line>
+                      <line x1="10" x2="8" y1="3" y2="21"></line>
+                      <line x1="16" x2="14" y1="3" y2="21"></line>
+                    </svg>
+                    Dispatch / Diary # <span id="diaryRequiredStar" class="text-rose-500 hidden">*</span>
+                  </span>
+                  <span id="diaryBadgeText" class="text-[11px] text-[#6B7A90] font-normal">Optional</span>
+                </label>
+                <input id="docDiaryNumber" type="text" placeholder="Reference or diary # (optional)" class="w-full px-3 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] placeholder-[#8E9BAE] focus:outline-none focus:border-[#1E63E9] transition"/>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-[#0B1F4A] mb-1.5">
+                Particulars / Notes (Optional)
+              </label>
+              <input id="docNotes" type="text" placeholder="Reference number, contractor name, or specific remarks..." class="w-full px-3 py-2 bg-white border border-[#E6ECF5] rounded-[10px] text-sm text-[#0B1F4A] placeholder-[#8E9BAE] focus:outline-none focus:border-[#1E63E9] transition"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-4 border-t border-[#E6ECF5]">
+          <button type="button" onclick="closeUploadModal()" class="btn-sky w-full sm:w-auto px-4 py-2 rounded-[10px] text-xs sm:text-sm font-semibold cursor-pointer text-center">
+            Cancel
+          </button>
+          <button type="submit" id="uploadSubmitBtn" class="btn-emerald w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-[10px] text-xs sm:text-sm font-bold cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Upload & Save Document</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Inward Diary / Outward Dispatch / Task Modal -->
+  <div id="newRecordModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;">
+    <div class="relative w-full max-w-2xl bg-white border border-[#E6ECF5] rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 space-y-5 max-h-[92vh] overflow-y-auto animate-modal-in" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E6ECF5]">
+        <div class="flex items-center gap-3">
+          <div id="newRecordModalIcon" class="p-2.5 rounded-xl bg-[#EDF3FE] text-[#1E63E9] shrink-0">
+            <!-- Icon replaced by JS -->
+          </div>
+          <div>
+            <h2 id="newRecordModalTitle" class="text-base font-bold text-[#0B1F4A]">Inward Letter (Diary)</h2>
+            <p id="newRecordModalSub" class="text-xs text-[#6B7A90]">Record incoming official communication in the master register</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeNewRecordModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="newRecordCustomForm" onsubmit="handleNewRecordSubmit(event)" class="space-y-4">
+        <div id="newRecordFieldsContainer" class="space-y-3.5">
+          <!-- Dynamically populated fields for diary / dispatch / locator / import / task -->
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-[#E6ECF5]">
+          <button type="button" onclick="closeNewRecordModal()" class="btn-sky px-4 py-2 rounded-[10px] font-semibold text-xs sm:text-sm cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="btn-emerald flex items-center justify-center gap-2 px-5 py-2 rounded-[10px] text-xs sm:text-sm font-bold cursor-pointer">
+            Save Record Entry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Document Viewer / Preview Modal -->
+  <div id="docViewerModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;">
+    <div class="relative w-full max-w-4xl bg-white border border-[#E6ECF5] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-modal-in" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-[#E6ECF5] bg-[#F8FAFD]">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="viewerFileIcon" class="p-2 rounded-lg bg-white border border-[#E6ECF5] shrink-0"></div>
+          <div class="min-w-0">
+            <h3 id="viewerTitle" class="text-sm font-bold text-[#0B1F4A] truncate max-w-lg">Document Preview</h3>
+            <p id="viewerMeta" class="text-[12px] text-[#6B7A90] font-mono"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a id="viewerDownloadBtn" href="#" download class="btn-emerald flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-xs font-bold transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </a>
+          <button type="button" onclick="closeDocViewerModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="viewerContent" class="flex-1 p-6 overflow-y-auto bg-slate-50 flex items-center justify-center min-h-[350px]">
+        <!-- Injected preview (image, iframe, or document card) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Share on Wi-Fi Modal -->
+  <div id="shareModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;">
+    <div class="relative w-full max-w-md bg-white border border-[#E6ECF5] rounded-2xl shadow-xl overflow-hidden p-6 sm:p-7 space-y-4 animate-modal-in" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-3.5 border-b border-[#E6ECF5]">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-xl bg-[#EDF3FE] text-[#1E63E9] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+              <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+          </div>
+          <div>
+            <h2 id="shareModalTitle" class="text-base font-bold text-[#0B1F4A]">Share on Same Wi-Fi</h2>
+            <p class="text-xs text-[#6B7A90]">Open on phone, tablet, or another laptop</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeShareModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- QR Code Container -->
+      <div class="p-5 rounded-xl bg-[#F8FAFD] border border-[#E6ECF5] text-center flex flex-col items-center justify-center space-y-3">
+        <div class="p-3 bg-white rounded-xl shadow-md inline-block border border-[#E6ECF5]">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=2&data=http://192.168.100.2:8080" alt="Scan to Open" class="w-40 h-40 block"/>
+        </div>
+        <p class="text-xs text-[#6B7A90] font-medium">Scan with your phone camera to open instantly!</p>
+      </div>
+
+      <!-- Wi-Fi URL with Copy Button -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-[#0B1F4A]">Or type this address in any browser:</label>
+        <div class="flex items-center gap-2">
+          <input type="text" readonly id="shareWifiUrlInput" value="http://192.168.100.2:8080" class="flex-1 px-3 py-2 bg-[#F8FAFD] border border-[#E6ECF5] rounded-[10px] text-xs text-[#1E63E9] font-mono font-semibold focus:outline-none"/>
+          <button type="button" onclick="copyShareWifiUrl()" class="btn-emerald px-4 py-2 rounded-[10px] text-xs font-bold transition cursor-pointer shrink-0">
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <!-- Instructions List -->
+      <div class="p-3.5 rounded-xl bg-[#EDF3FE] border border-[#D0E0FD] text-xs text-[#1E63E9] space-y-1">
+        <p class="font-bold flex items-center gap-1.5 text-[#0B1F4A]">
+          <span class="h-2 w-2 rounded-full bg-[#1E63E9]"></span>
+          Quick Instructions:
+        </p>
+        <p class="text-[#6B7A90]">1. Ensure device is connected to the <strong>same Wi-Fi network</strong>.</p>
+        <p class="text-[#6B7A90]">2. Scan QR code or open Chrome / Safari and visit: <span class="font-mono font-bold text-[#1E63E9]">http://192.168.100.2:8080</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Alert -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white border border-[#E6ECF5] shadow-xl text-xs transition-all duration-300 opacity-0 pointer-events-none translate-y-3">
+    <div id="toastIcon"></div>
+    <span id="toastText" class="font-medium text-[#0B1F4A]"></span>
+  </div>
+
+  </div> <!-- End Authenticated Application Container (#authenticatedApp) -->
+
+  <!-- Application Script (Cache Busted) -->
+  <script src="app.js?v=20261030_v7_clean_auth"></script>
+
+  <!-- Clerk Corporate Authentication Gate & Lifecycle Handler -->
+  <script>
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('loginPassword');
+      const eyeOpen = document.getElementById('eyeIconOpen');
+      const eyeClosed = document.getElementById('eyeIconClosed');
+      if (!pwd) return;
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'block';
+      } else {
+        pwd.type = 'password';
+        if (eyeOpen) eyeOpen.style.display = 'block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
+      }
+    }
+
+    function showDashboard() {
+      const loginScreen = document.getElementById('corporateLoginScreen');
+      const authApp = document.getElementById('authenticatedApp');
+      const userButtonEl = document.getElementById('clerk-user-button');
+      const userBadgeEl = document.getElementById('clerkUserBadge');
+
+      if (loginScreen) {
+        loginScreen.classList.add('hidden-auth');
+        loginScreen.style.setProperty('display', 'none', 'important');
+      }
+      if (authApp) {
+        authApp.classList.remove('hidden-auth');
+        authApp.style.setProperty('display', 'contents', 'important');
+      }
+
+      const user = window.Clerk?.user || window.Clerk?.session?.user;
+      const displayName = user?.username || user?.firstName || user?.primaryEmailAddress?.emailAddress || 'Staff User';
+      if (userBadgeEl) userBadgeEl.textContent = displayName;
+
+      if (userButtonEl && window.Clerk?.mountUserButton) {
+        userButtonEl.innerHTML = '';
+        window.Clerk.mountUserButton(userButtonEl, {
+          afterSignOutUrl: window.location.href
+        });
+      }
+    }
+    window.showDashboard = showDashboard;
+
+    function showLoginScreen() {
+      const loginScreen = document.getElementById('corporateLoginScreen');
+      const authApp = document.getElementById('authenticatedApp');
+      if (authApp) {
+        authApp.classList.add('hidden-auth');
+        authApp.style.setProperty('display', 'none', 'important');
+      }
+      if (loginScreen) {
+        loginScreen.classList.remove('hidden-auth');
+        loginScreen.style.setProperty('display', 'flex', 'important');
+      }
+      const usernameInput = document.getElementById('loginUsername');
+      const passwordInput = document.getElementById('loginPassword');
+      if (usernameInput) usernameInput.value = '';
+      if (passwordInput) passwordInput.value = '';
+      hideLoginError();
+    }
+
+    function hideLoginError() {
+      const errAlert = document.getElementById('loginErrorAlert');
+      const errMsg = document.getElementById('loginErrorMsg');
+      if (errAlert) {
+        errAlert.classList.remove('visible');
+        errAlert.style.setProperty('display', 'none', 'important');
+      }
+      if (errMsg) errMsg.textContent = '';
+    }
+
+    function showLoginError(msg) {
+      const errAlert = document.getElementById('loginErrorAlert');
+      const errMsg = document.getElementById('loginErrorMsg');
+      if (errMsg) errMsg.textContent = msg || 'Invalid corporate username or password.';
+      if (errAlert) {
+        errAlert.classList.add('visible');
+        errAlert.style.setProperty('display', 'flex', 'important');
+      }
+    }
+
+    async function handleCorporateLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      hideLoginError();
+
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      const btnText = document.getElementById('loginBtnText');
+      const btnSpinner = document.getElementById('loginBtnSpinner');
+      const usernameInput = document.getElementById('loginUsername');
+      const passwordInput = document.getElementById('loginPassword');
+
+      const identifier = usernameInput?.value?.trim();
+      const password = passwordInput?.value;
+
+      if (!identifier || !password) {
+        showLoginError('Please enter both corporate username and password.');
+        return;
+      }
+
+      // UI loading state
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnText) btnText.textContent = 'Verifying Credentials...';
+      if (btnSpinner) btnSpinner.style.display = 'inline-block';
+
+      try {
+        // Wait up to 3 seconds for Clerk if SDK is still connecting
+        if (!window.Clerk || !window.Clerk.client) {
+          let count = 0;
+          while ((!window.Clerk || !window.Clerk.client) && count < 30) {
+            await new Promise(r => setTimeout(r, 100));
+            count++;
+          }
+        }
+
+        if (!window.Clerk || !window.Clerk.client) {
+          throw new Error('Clerk security service is still connecting. Please try again.');
+        }
+
+        // 1. If user is already authenticated, go directly to dashboard
+        if (window.Clerk.user || window.Clerk.session) {
+          showDashboard();
+          return;
+        }
+
+        // 2. If client has an existing active session, activate and show dashboard
+        if (window.Clerk.client?.sessions?.length > 0) {
+          await window.Clerk.setActive({ session: window.Clerk.client.sessions[0].id });
+          showDashboard();
+          return;
+        }
+
+        // 3. Initiate Clerk sign in
+        let signInAttempt = null;
+        try {
+          signInAttempt = await window.Clerk.client.signIn.create({
+            identifier: identifier,
+            password: password,
+          });
+        } catch (createErr) {
+          const createMsg = createErr.errors?.[0]?.longMessage || createErr.errors?.[0]?.message || createErr.message || '';
+          if (createMsg.toLowerCase().includes('already signed in')) {
+            if (window.Clerk.client?.sessions?.length > 0) {
+              await window.Clerk.setActive({ session: window.Clerk.client.sessions[0].id });
+            }
+            showDashboard();
+            return;
+          }
+          // If direct password failed, try with identifier only first
+          signInAttempt = await window.Clerk.client.signIn.create({
+            identifier: identifier
+          });
+        }
+
+        // 4. If password factor is required, attempt password factor
+        if (signInAttempt.status === 'needs_first_factor') {
+          signInAttempt = await signInAttempt.attemptFirstFactor({
+            strategy: 'password',
+            password: password,
+          });
+        }
+
+        // 5. Complete session
+        if (signInAttempt.status === 'complete') {
+          await window.Clerk.setActive({ session: signInAttempt.createdSessionId });
+          if (usernameInput) usernameInput.value = '';
+          if (passwordInput) passwordInput.value = '';
+          showDashboard();
+        } else {
+          throw new Error('Sign-in status: ' + signInAttempt.status);
+        }
+      } catch (err) {
+        console.warn('Clerk auth attempt:', err);
+        const detailedMsg = err.errors?.[0]?.longMessage || err.errors?.[0]?.message || err.message || '';
+
+        // If Clerk says already signed in -> UNLOCK DASHBOARD!
+        if (detailedMsg.toLowerCase().includes('already signed in')) {
+          if (window.Clerk?.client?.sessions?.length > 0) {
+            await window.Clerk.setActive({ session: window.Clerk.client.sessions[0].id });
+          }
+          showDashboard();
+          return;
+        }
+
+        showLoginError(detailedMsg || 'Invalid corporate username or password.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnText) btnText.textContent = 'Sign In to Corporate Hub';
+        if (btnSpinner) btnSpinner.style.display = 'none';
+      }
+    }
+
+    async function handleCorporateLogout() {
+      if (window.Clerk) {
+        try {
+          await window.Clerk.signOut();
+        } catch (e) {
+          console.error('Logout error:', e);
+        }
+      }
+      showLoginScreen();
+    }
+
+    // Auto-check on page load
+    (function initAuth() {
+      const checkTimer = setInterval(async () => {
+        if (typeof window.Clerk !== 'undefined' && window.Clerk.load) {
+          clearInterval(checkTimer);
+          try {
+            await window.Clerk.load();
+            if (window.Clerk.user || window.Clerk.session) {
+              showDashboard();
+            } else if (window.Clerk.client?.sessions?.length > 0) {
+              await window.Clerk.setActive({ session: window.Clerk.client.sessions[0].id });
+              showDashboard();
+            } else {
+              showLoginScreen();
+            }
+
+            window.Clerk.addListener(() => {
+              if (window.Clerk.user || window.Clerk.session) {
+                showDashboard();
+              } else {
+                showLoginScreen();
+              }
+            });
+          } catch (e) {
+            console.warn('Clerk init check:', e);
+          }
+        }
+      }, 50);
+    })();
+  </script>
+</body>
+</html>
