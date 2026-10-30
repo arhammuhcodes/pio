@@ -1505,14 +1505,13 @@ function viewDocument(recordId) {
 
   if (isImage) {
     content.innerHTML = `
-      <div class="space-y-4 text-center">
-        <div class="p-2 bg-slate-100 rounded-2xl inline-block max-w-full">
-          <img src="${rec.file_url}" alt="${escapeHtml(rec.title)}" class="max-h-[68vh] max-w-full rounded-xl object-contain shadow-md mx-auto"/>
+      <div class="flex flex-col items-center justify-center w-full space-y-3">
+        <div class="p-2 bg-white rounded-xl border border-[#E6ECF5] shadow-sm max-w-full flex items-center justify-center">
+          <img src="${rec.file_url}" alt="${escapeHtml(rec.title)}" class="max-h-[50vh] sm:max-h-[55vh] max-w-full w-auto object-contain rounded-lg"/>
         </div>
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center justify-center gap-2.5 pt-1 shrink-0 flex-wrap">
           <a href="${rec.file_url}" target="_blank" rel="noopener noreferrer" class="btn-sky py-2 px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
-            <span>Open High-Res in New Tab</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" x2="21" y1="14" y2="3"></line></svg>
+            <span>Open High-Res ↗</span>
           </a>
           <button onclick="downloadDocument('${rec.id}')" class="btn-emerald py-2 px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
@@ -1523,12 +1522,16 @@ function viewDocument(recordId) {
     `;
   } else if (isPdf) {
     content.innerHTML = `
-      <div class="w-full space-y-3">
-        <iframe src="${rec.file_url}" class="w-full h-[70vh] rounded-xl border border-slate-300"></iframe>
-        <div class="flex items-center justify-end gap-3">
-          <a href="${rec.file_url}" target="_blank" rel="noopener noreferrer" class="btn-sky py-1.5 px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5">
+      <div class="w-full space-y-3 flex flex-col items-center">
+        <iframe src="${rec.file_url}" class="w-full h-[52vh] sm:h-[58vh] rounded-xl border border-[#E6ECF5]"></iframe>
+        <div class="flex items-center justify-end gap-2.5 w-full pt-1 shrink-0">
+          <a href="${rec.file_url}" target="_blank" rel="noopener noreferrer" class="btn-sky py-2 px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
             <span>Open PDF in Tab ↗</span>
           </a>
+          <button onclick="downloadDocument('${rec.id}')" class="btn-emerald py-2 px-4 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+            <span>Download PDF</span>
+          </button>
         </div>
       </div>
     `;

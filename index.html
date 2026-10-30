@@ -1410,26 +1410,26 @@
   </div>
 
   <!-- Document Viewer / Preview Modal -->
-  <div id="docViewerModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden animate-fade-in" style="background-color: rgba(11, 31, 74, 0.85) !important;">
-    <div class="relative w-full max-w-4xl bg-white border border-[#E6ECF5] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-modal-in" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-[#E6ECF5] bg-[#F8FAFD]">
-        <div class="flex items-center gap-3 min-w-0">
-          <div id="viewerFileIcon" class="p-2 rounded-lg bg-white border border-[#E6ECF5] shrink-0"></div>
+  <div id="docViewerModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 hidden" style="background-color: rgba(11, 31, 74, 0.85) !important;" onclick="closeDocViewerModal()">
+    <div class="relative w-full max-w-3xl bg-white border border-[#E6ECF5] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[86vh] animate-modal-in" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#E6ECF5] bg-[#F8FAFD] shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="viewerFileIcon" class="p-1.5 rounded-lg bg-white border border-[#E6ECF5] shrink-0"></div>
           <div class="min-w-0">
-            <h3 id="viewerTitle" class="text-sm font-bold text-[#0B1F4A] truncate max-w-lg">Document Preview</h3>
-            <p id="viewerMeta" class="text-[12px] text-[#6B7A90] font-mono"></p>
+            <h3 id="viewerTitle" class="text-xs sm:text-sm font-bold text-[#0B1F4A] truncate max-w-xs sm:max-w-md">Document Preview</h3>
+            <p id="viewerMeta" class="text-[11px] text-[#6B7A90] font-mono truncate"></p>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <a id="viewerDownloadBtn" href="#" download class="btn-emerald flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] text-xs font-bold transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <a id="viewerDownloadBtn" href="#" download class="btn-emerald flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-bold transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" y2="3"></line>
+              <line x1="12" x2="12" y1="15" y2="3"></line>
             </svg>
             <span>Download</span>
           </a>
-          <button type="button" onclick="closeDocViewerModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+          <button type="button" onclick="closeDocViewerModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer" aria-label="Close Preview">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6 6 18"></path>
               <path d="m6 6 12 12"></path>
@@ -1438,7 +1438,7 @@
         </div>
       </div>
 
-      <div id="viewerContent" class="flex-1 p-6 overflow-y-auto bg-slate-50 flex items-center justify-center min-h-[350px]">
+      <div id="viewerContent" class="flex-1 p-3 sm:p-5 overflow-y-auto bg-slate-50 flex flex-col items-center justify-center">
         <!-- Injected preview (image, iframe, or document card) -->
       </div>
     </div>
@@ -1510,7 +1510,7 @@
   </div> <!-- End Authenticated Application Container (#authenticatedApp) -->
 
   <!-- Application Script (Cache Busted) -->
-  <script src="app.js?v=20261030_v9_flicker_free"></script>
+  <script src="app.js?v=20261030_v10_modal_fit"></script>
 
   <!-- Clerk Corporate Authentication Gate & Lifecycle Handler -->
   <script>
